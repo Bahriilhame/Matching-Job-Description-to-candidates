@@ -1,4 +1,3 @@
-# FastAPI (main.py)
 import os
 import google.generativeai as genai
 from fastapi import FastAPI, UploadFile, File
@@ -24,17 +23,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ====== PDF -> Texte ======
-def extract_text_from_pdf(file) -> str:
+def extract_text_from_pdf(file_bytes) -> str:
     text = ""
     try:
-        reader = PdfReader(file)
+        # Create a BytesIO object to make the bytes seekable
+        from io import BytesIO
+        pdf_file = BytesIO(file_bytes)
+        
+        reader = PdfReader(pdf_file)
         for page in reader.pages:
             text += page.extract_text()
     except Exception as e:
         print(f"Error reading PDF: {e}")
         return ""
     return text
+
 
 # ====== Prompt Generator ======
 def build_prompt(cv_text: str) -> str:
@@ -99,29 +102,33 @@ extrait les données de ce cv en objet JSON bien structuré :
 
 @app.post("/extract-cv/")
 async def extract_cv(file: UploadFile = File(...)):
-    print(f"Received file: {file.filename}, Content Type: {file.content_type}")
     try:
         contents = await file.read()
-        cv_text = extract_text_from_pdf(file.file)
-        print(f"Extracted text from PDF:\n{cv_text}")
+        cv_text = extract_text_from_pdf(contents)
+        
         if not cv_text:
-            print("PDF text extraction failed or was empty.")
-            return {}  # juste un objet vide
+            return {"status": "success", "data": {}}
 
         prompt = build_prompt(cv_text)
-        print(f"Generated Prompt:\n{prompt}")
         response = model.generate_content(prompt)
         extracted_data_str = response.text.strip()
-        print(f"Raw response from Gemini:\n{extracted_data_str}")
 
-        try:
-            extracted_data_json = json.loads(extracted_data_str)
-            print(f"Parsed JSON data:\n{extracted_data_json}")
-            return extracted_data_json  # ✅ retour direct sans clé "data"
-        except json.JSONDecodeError as e:
-            print(f"JSON Decode Error: {e}")
-            return {}
+        # Handle both wrapped and direct JSON responses
+        if extracted_data_str.startswith('```json'):
+            json_str = extracted_data_str[7:-3].strip()
+            extracted_data = json.loads(json_str)
+        else:
+            extracted_data = json.loads(extracted_data_str)
+
+        return {
+            "status": "success",
+            "data": extracted_data
+        }
 
     except Exception as e:
         print(f"Error processing file: {e}")
-        return {}
+        return {
+            "status": "error",
+            "message": str(e),
+            "data": {}
+        }

@@ -56,9 +56,6 @@ let schema = new mongoose.Schema(
     profile: {
       type: String,
     },
-
-
-
     extractedData: {
       nom: String,
       contact: {
@@ -78,10 +75,10 @@ let schema = new mongoose.Schema(
       ],
       formation: [
         {
-          type: String,
-          spécialité: String,
-          durée: String,
-          établissement: String,
+          type: { type: String },
+          spécialité: { type: String },
+          durée: { type: String },
+          établissement: { type: String },
         },
       ],
       compétences: {
@@ -105,11 +102,6 @@ let schema = new mongoose.Schema(
         },
       ],
     },
-
-
-
-
-    
   },
   { collation: { locale: "en" } }
 );

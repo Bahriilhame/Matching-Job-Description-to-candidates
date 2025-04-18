@@ -293,14 +293,183 @@ const router = express.Router();
 
 const multer = require('multer');
 
-const upload = multer(); // For handling multipart/form-data
+// const upload = multer(); // For handling multipart/form-data
 
 
 // working 
 
+// router.post("/signup", upload.single('resume'), async (req, res) => {
+//   const data = req.body;
+//   const resumeFile = req.file; // Check if a file was uploaded
+
+//   let user = new User({
+//     email: data.email,
+//     password: data.password,
+//     type: data.type,
+//   });
+
+//   try {
+//     await user.save();
+
+//     let userDetails;
+//     if (user.type == "recruiter") {
+//       userDetails = new Recruiter({
+//         userId: user._id,
+//         name: data.name,
+//         contactNumber: data.contactNumber,
+//         bio: data.bio,
+//       });
+//       await userDetails.save();
+//       const token = jwt.sign({ _id: user._id }, authKeys.jwtSecretKey);
+//       return res.json({ token: token, type: user.type });
+//     } else {
+//       userDetails = new JobApplicant({
+//         userId: user._id,
+//         name: data.name,
+//         education: data.education,
+//         skills: data.skills,
+//         rating: data.rating,
+//         resume: req.file ? `/host/resume/${req.file.filename}` : data.resume, // Store path if uploaded, URL if provided
+//         profile: data.profile,
+//       });
+
+//       let extractedData = {};
+
+//       if (resumeFile) { // Handle direct file upload
+//         try {
+//           console.log("Resume file received:", resumeFile.originalname);
+//           const formDataForFastAPI = new FormData();
+//           formDataForFastAPI.append('file', resumeFile.buffer, resumeFile.originalname);
+
+//           const extractionResponse = await axios.post(
+//             "http://127.0.0.1:8000/extract-cv/",
+//             formDataForFastAPI,
+//             { headers: { ...formDataForFastAPI.getHeaders() } }
+//           );
+//           console.log("Extraction API Response (file upload):", extractionResponse.data);
+//           extractedData = extractionResponse.data.data;
+//         } catch (error) {
+//           console.error("Error calling extraction API (file upload):", error);
+//           res.json({ token: jwt.sign({ _id: user._id }, authKeys.jwtSecretKey), type: "applicant", message: "Signup successful, but CV extraction failed (file upload)." });
+//           return;
+//         }
+//       } else if (data.resume) {
+//         if (data.resume.startsWith("http") || data.resume.startsWith("https")) {
+//           // Handle resume URL
+//           try {
+//             console.log("Fetching resume from URL:", data.resume);
+//             const response = await axios.get(data.resume, { responseType: 'arraybuffer' });
+//             const formDataForFastAPI = new FormData();
+//             formDataForFastAPI.append('file', Buffer.from(response.data, 'binary'), 'resume_from_url.pdf'); // Provide a generic filename
+
+//             const extractionResponse = await axios.post(
+//               "http://127.0.0.1:8000/extract-cv/",
+//               formDataForFastAPI,
+//               { headers: { ...formDataForFastAPI.getHeaders() } }
+//             );
+//             console.log("Extraction API Response (URL):", extractionResponse.data);
+//             extractedData = extractionResponse.data.data;
+//           } catch (error) {
+//             console.error("Error calling extraction API (URL):", error);
+//             res.json({ token: jwt.sign({ _id: user._id }, authKeys.jwtSecretKey), type: "applicant", message: "Signup successful, but CV extraction failed (URL)." });
+//             return;
+//           }
+//         } else if (data.resume.startsWith('/host/resume/')) {
+//           // Handle locally stored file path (after upload)
+//           try {
+//             // const resumeFilePath = path.join(__dirname, 'public', 'resume', path.basename(data.resume));
+//             const resumeFilePath = path.join(__dirname, '..', 'public', 'resume', path.basename(data.resume));
+//             console.log("Attempting to read local resume from:", resumeFilePath);
+//             const fileBuffer = await fs.readFile(resumeFilePath);
+//             const formDataForFastAPI = new FormData();
+//             formDataForFastAPI.append('file', fileBuffer, path.basename(data.resume));
+
+//             const extractionResponse = await axios.post(
+//               "http://127.0.0.1:8000/extract-cv/",
+//               formDataForFastAPI,
+//               { headers: { ...formDataForFastAPI.getHeaders() } }
+//             );
+//             console.log("Extraction API Response (file upload):", extractionResponse.data);
+  
+//             let extractedData = {};
+//             if (typeof extractionResponse.data === 'string' && extractionResponse.data.startsWith('```json')) {
+//               const jsonString = extractionResponse.data.substring(7, extractionResponse.data.length - 3).trim(); // Remove ```json and ```
+//               try {
+//                 extractedData = JSON.parse(jsonString);
+//               } catch (parseError) {
+//                 console.error("Error parsing final JSON string:", parseError);
+//                 extractedData = {}; // Handle parsing error
+//               }
+//             } else {
+//               extractedData = extractionResponse.data; // If it's already a parsed object (shouldn't be the case now)
+//             }
+
+
+
+//           } catch (error) {
+//             console.error("Error processing local resume file:", error);
+//             res.json({ token: jwt.sign({ _id: user._id }, authKeys.jwtSecretKey), type: "applicant", message: "Signup successful, but error processing local resume file." });
+//             return;
+//           }
+//         } else {
+//           console.log("No resume file or valid URL provided.");
+//           userDetails.resume = null; // Or handle as needed
+//         }
+//       } else {
+//         userDetails.resume = null; // No resume provided
+//       }
+
+//       const updatedUserDetails = { ...userDetails.toObject(), extractedData };
+//       const savedJobApplicant = new JobApplicant(updatedUserDetails);
+//       await savedJobApplicant.save();
+
+//       const token = jwt.sign({ _id: user._id }, authKeys.jwtSecretKey);
+//       res.json({ token: token, type: user.type, extractedData: extractedData });
+//     }
+//   } catch (err) {
+//     console.error("Error during signup:", err);
+//     if (user._id) {
+//       try {
+//         await User.findByIdAndDelete(user._id);
+//       } catch (deleteErr) {
+//         console.error("Error deleting user after signup failure:", deleteErr);
+//         return res.status(500).json({ error: "Signup failed and failed to rollback user creation." });
+//       }
+//     }
+//     res.status(400).json(err);
+//   }
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// essay
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "..", "public", "resume"));
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
+
+
 router.post("/signup", upload.single('resume'), async (req, res) => {
   const data = req.body;
-  const resumeFile = req.file; // Check if a file was uploaded
+  const resumeFile = req.file;
 
   let user = new User({
     email: data.email,
@@ -323,21 +492,13 @@ router.post("/signup", upload.single('resume'), async (req, res) => {
       const token = jwt.sign({ _id: user._id }, authKeys.jwtSecretKey);
       return res.json({ token: token, type: user.type });
     } else {
-      userDetails = new JobApplicant({
-        userId: user._id,
-        name: data.name,
-        education: data.education,
-        skills: data.skills,
-        rating: data.rating,
-        resume: req.file ? `/host/resume/${req.file.filename}` : data.resume, // Store path if uploaded, URL if provided
-        profile: data.profile,
-      });
-
       let extractedData = {};
+      let resumePath = null;
 
-      if (resumeFile) { // Handle direct file upload
+      // Handle resume extraction
+      if (resumeFile) {
+        resumePath = `/host/resume/${resumeFile.filename}`;
         try {
-          console.log("Resume file received:", resumeFile.originalname);
           const formDataForFastAPI = new FormData();
           formDataForFastAPI.append('file', resumeFile.buffer, resumeFile.originalname);
 
@@ -346,103 +507,117 @@ router.post("/signup", upload.single('resume'), async (req, res) => {
             formDataForFastAPI,
             { headers: { ...formDataForFastAPI.getHeaders() } }
           );
-          console.log("Extraction API Response (file upload):", extractionResponse.data);
-          extractedData = extractionResponse.data.data;
+
+          if (extractionResponse.data && extractionResponse.data.data) {
+            extractedData = extractionResponse.data.data;
+            console.log("Successfully extracted CV data:", extractedData);
+          } else {
+            console.log("CV extraction returned empty data");
+          }
         } catch (error) {
-          console.error("Error calling extraction API (file upload):", error);
-          res.json({ token: jwt.sign({ _id: user._id }, authKeys.jwtSecretKey), type: "applicant", message: "Signup successful, but CV extraction failed (file upload)." });
-          return;
+          console.error("CV extraction error:", error.message);
+          // Continue with signup even if extraction fails
         }
       } else if (data.resume) {
-        if (data.resume.startsWith("http") || data.resume.startsWith("https")) {
-          // Handle resume URL
-          try {
-            console.log("Fetching resume from URL:", data.resume);
+        resumePath = data.resume;
+
+        try {
+          let fileBuffer;
+          if (data.resume.startsWith("http") || data.resume.startsWith("https")) {
+            // Handle URL
             const response = await axios.get(data.resume, { responseType: 'arraybuffer' });
-            const formDataForFastAPI = new FormData();
-            formDataForFastAPI.append('file', Buffer.from(response.data, 'binary'), 'resume_from_url.pdf'); // Provide a generic filename
-
-            const extractionResponse = await axios.post(
-              "http://127.0.0.1:8000/extract-cv/",
-              formDataForFastAPI,
-              { headers: { ...formDataForFastAPI.getHeaders() } }
-            );
-            console.log("Extraction API Response (URL):", extractionResponse.data);
-            extractedData = extractionResponse.data.data;
-          } catch (error) {
-            console.error("Error calling extraction API (URL):", error);
-            res.json({ token: jwt.sign({ _id: user._id }, authKeys.jwtSecretKey), type: "applicant", message: "Signup successful, but CV extraction failed (URL)." });
-            return;
-          }
-        } else if (data.resume.startsWith('/host/resume/')) {
-          // Handle locally stored file path (after upload)
-          try {
-            // const resumeFilePath = path.join(__dirname, 'public', 'resume', path.basename(data.resume));
+            fileBuffer = Buffer.from(response.data, 'binary');
+          } else if (data.resume.startsWith('/host/resume/')) {
+            // Handle local file
             const resumeFilePath = path.join(__dirname, '..', 'public', 'resume', path.basename(data.resume));
-            console.log("Attempting to read local resume from:", resumeFilePath);
-            const fileBuffer = await fs.readFile(resumeFilePath);
+            fileBuffer = await fs.readFile(resumeFilePath);
+          }
+
+          if (fileBuffer) {
             const formDataForFastAPI = new FormData();
-            formDataForFastAPI.append('file', fileBuffer, path.basename(data.resume));
+            formDataForFastAPI.append('file', fileBuffer, 'resume.pdf');
 
             const extractionResponse = await axios.post(
               "http://127.0.0.1:8000/extract-cv/",
               formDataForFastAPI,
               { headers: { ...formDataForFastAPI.getHeaders() } }
             );
-            console.log("Extraction API Response (file upload):", extractionResponse.data);
-  
-            let extractedData = {};
-            if (typeof extractionResponse.data === 'string' && extractionResponse.data.startsWith('```json')) {
-              const jsonString = extractionResponse.data.substring(7, extractionResponse.data.length - 3).trim(); // Remove ```json and ```
-              try {
-                extractedData = JSON.parse(jsonString);
-              } catch (parseError) {
-                console.error("Error parsing final JSON string:", parseError);
-                extractedData = {}; // Handle parsing error
-              }
-            } else {
-              extractedData = extractionResponse.data; // If it's already a parsed object (shouldn't be the case now)
+
+            if (extractionResponse.data && extractionResponse.data.data) {
+              extractedData = extractionResponse.data.data;
+              console.log("Successfully extracted CV data from URL/local path:", extractedData);
             }
-
-
-
-          } catch (error) {
-            console.error("Error processing local resume file:", error);
-            res.json({ token: jwt.sign({ _id: user._id }, authKeys.jwtSecretKey), type: "applicant", message: "Signup successful, but error processing local resume file." });
-            return;
           }
-        } else {
-          console.log("No resume file or valid URL provided.");
-          userDetails.resume = null; // Or handle as needed
+        } catch (error) {
+          console.error("Resume processing error:", error.message);
         }
-      } else {
-        userDetails.resume = null; // No resume provided
       }
 
-      const updatedUserDetails = { ...userDetails.toObject(), extractedData };
-      const savedJobApplicant = new JobApplicant(updatedUserDetails);
-      await savedJobApplicant.save();
+      // Create user details with extracted data
+      userDetails = new JobApplicant({
+        userId: user._id,
+        name: data.name,
+        education: data.education || [],
+        skills: data.skills || extractedData.compétences?.autres || [],
+        rating: data.rating || -1,
+        resume: resumePath,
+        profile: data.profile,
+        extractedData: {
+          nom: extractedData.nom,
+          contact: extractedData.contact,
+          expérience: extractedData.expérience,
+          formation: extractedData.formation,
+          compétences: extractedData.compétences,
+          langues: extractedData.langues,
+          projets: extractedData.projets,
+        }
+      });
 
-      const token = jwt.sign({ _id: user._id }, authKeys.jwtSecretKey);
-      res.json({ token: token, type: user.type, extractedData: extractedData });
+      try {
+        await userDetails.save();
+
+        const token = jwt.sign({ _id: user._id }, authKeys.jwtSecretKey);
+        return res.json({
+          token: token,
+          type: user.type,
+          extractedData: extractedData
+        });
+      } catch (validationError) {
+        console.error("Error saving JobApplicantInfo:", validationError);
+        if (user._id) {
+          try {
+            await User.findByIdAndDelete(user._id);
+          } catch (deleteErr) {
+            console.error("Rollback error:", deleteErr);
+          }
+        }
+        res.status(400).json({
+          error: "Signup failed",
+          message: validationError.message
+        });
+      }
     }
   } catch (err) {
-    console.error("Error during signup:", err);
+    console.error("Signup error:", err);
     if (user._id) {
       try {
         await User.findByIdAndDelete(user._id);
       } catch (deleteErr) {
-        console.error("Error deleting user after signup failure:", deleteErr);
-        return res.status(500).json({ error: "Signup failed and failed to rollback user creation." });
+        console.error("Rollback error:", deleteErr);
       }
     }
-    res.status(400).json(err);
+    res.status(400).json({
+      error: "Signup failed",
+      message: err.message
+    });
   }
 });
 
 
 
 
+
+// 
 
 
 
