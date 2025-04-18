@@ -56,6 +56,60 @@ let schema = new mongoose.Schema(
     profile: {
       type: String,
     },
+
+
+
+    extractedData: {
+      nom: String,
+      contact: {
+        telephone: String,
+        email: String,
+        adresse: String,
+        social: [String],
+      },
+      expérience: [
+        {
+          poste: String,
+          lieu: String,
+          durée: String,
+          entreprise: String,
+          tâches: [String],
+        },
+      ],
+      formation: [
+        {
+          type: String,
+          spécialité: String,
+          durée: String,
+          établissement: String,
+        },
+      ],
+      compétences: {
+        outils: [String],
+        technologies: [String],
+        autres: [String],
+      },
+      langues: [
+        {
+          langue: String,
+          niveau: String,
+        },
+      ],
+      projets: [
+        {
+          nom: String,
+          description: String,
+          technologies: [String],
+          outils: [String],
+          lien: String,
+        },
+      ],
+    },
+
+
+
+
+    
   },
   { collation: { locale: "en" } }
 );
