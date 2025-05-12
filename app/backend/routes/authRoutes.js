@@ -158,19 +158,19 @@
 
 
 
-const express = require("express");
-const passport = require("passport");
-const jwt = require("jsonwebtoken");
-const authKeys = require("../lib/authKeys");
-const axios = require("axios");
-const FormData = require('form-data');
-const fs = require('fs').promises; // For reading local files
-const path = require('path');
-const User = require("../db/User");
-const JobApplicant = require("../db/JobApplicant");
-const Recruiter = require("../db/Recruiter");
+// const express = require("express");
+// const passport = require("passport");
+// const jwt = require("jsonwebtoken");
+// const authKeys = require("../lib/authKeys");
+// const axios = require("axios");
+// const FormData = require('form-data');
+// const fs = require('fs').promises; // For reading local files
+// const path = require('path');
+// const User = require("../db/User");
+// const JobApplicant = require("../db/JobApplicant");
+// const Recruiter = require("../db/Recruiter");
 
-const router = express.Router();
+// const router = express.Router();
 
 // Retourne exctracted vide
 // router.post("/signup", async (req, res) => {
@@ -449,8 +449,19 @@ const multer = require('multer');
 
 
 
+const express = require("express");
+const passport = require("passport");
+const jwt = require("jsonwebtoken");
+const authKeys = require("../lib/authKeys");
+const axios = require("axios");
+const FormData = require('form-data');
+const fs = require('fs').promises; // For reading local files
+const path = require('path');
+const User = require("../db/User");
+const JobApplicant = require("../db/JobApplicant");
+const Recruiter = require("../db/Recruiter");
 
-
+const router = express.Router();
 
 
 // essay
