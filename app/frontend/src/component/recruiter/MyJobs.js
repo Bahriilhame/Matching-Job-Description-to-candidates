@@ -186,6 +186,16 @@ const JobTile = (props) => {
               View Applications
             </Button>
           </Grid>
+          <Grid item xs>
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.statusBlock}
+              onClick={() => handleClick(`/job/matchedapplications/${job._id}`)}
+            >
+              View Matched Applications
+            </Button>
+          </Grid>
           <Grid item>
             <Button
               variant="contained"
