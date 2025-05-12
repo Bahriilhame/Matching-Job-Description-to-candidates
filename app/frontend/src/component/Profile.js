@@ -17,6 +17,8 @@ import FaceIcon from "@material-ui/icons/Face";
 import { SetPopupContext } from "../App";
 
 import apiList from "../lib/apiList";
+import DeleteIcon from "@material-ui/icons/Delete";
+import IconButton from "@material-ui/core/IconButton";
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -38,11 +40,11 @@ const MultifieldInput = (props) => {
   return (
     <>
       {education.map((obj, key) => (
-        <Grid item container className={classes.inputBox} key={key}>
-          <Grid item xs={6}>
+        <Grid item container className={classes.inputBox} spacing={2} key={key} alignItems="center">
+          <Grid item xs={7}>
             <TextField
               label={`Institution Name #${key + 1}`}
-              value={education[key].institutionName}
+              value={obj.institutionName}
               onChange={(event) => {
                 const newEdu = [...education];
                 newEdu[key].institutionName = event.target.value;
@@ -52,7 +54,7 @@ const MultifieldInput = (props) => {
               fullWidth
             />
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={2}>
             <TextField
               label="Start Year"
               value={obj.startYear}
@@ -63,9 +65,10 @@ const MultifieldInput = (props) => {
                 newEdu[key].startYear = event.target.value;
                 setEducation(newEdu);
               }}
+              fullWidth
             />
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={2}>
             <TextField
               label="End Year"
               value={obj.endYear}
@@ -76,10 +79,27 @@ const MultifieldInput = (props) => {
                 newEdu[key].endYear = event.target.value;
                 setEducation(newEdu);
               }}
+              fullWidth
             />
+          </Grid>
+          <Grid item xs={1}>
+            <IconButton
+              color="secondary"
+              onClick={() => {
+                const updatedEducation = [...education];
+                updatedEducation.splice(key, 1);
+                setEducation(updatedEducation);
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
           </Grid>
         </Grid>
       ))}
+
+
+
+
       <Grid item style={{ alignSelf: "center" }}>
         <Button
           variant="contained"

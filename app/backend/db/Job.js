@@ -10,6 +10,11 @@ let schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     maxApplicants: {
       type: Number,
       validate: [

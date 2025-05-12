@@ -27,6 +27,7 @@ router.post("/jobs", jwtAuth, (req, res) => {
   let job = new Job({
     userId: user._id,
     title: data.title,
+    description: data.description,
     maxApplicants: data.maxApplicants,
     maxPositions: data.maxPositions,
     dateOfPosting: data.dateOfPosting,

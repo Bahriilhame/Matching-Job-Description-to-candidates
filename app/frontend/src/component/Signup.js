@@ -9,6 +9,8 @@ import {
   MenuItem,
   Input,
 } from "@material-ui/core";
+import { IconButton } from '@material-ui/core';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import DownloadIcon from "@material-ui/icons/GetApp";
 
@@ -33,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     padding: "60px 60px",
   },
   inputBox: {
-    width: "400px",
+    width: "700px",
   },
   submitButton: {
     width: "400px",
@@ -152,10 +154,17 @@ const TemplateDownload = ({signupDetails = {}}) => {
 }
 
 
-
 const MultifieldInput = (props) => {
   const classes = useStyles();
   const { education, setEducation } = props;
+
+  const handleDelete = (index) => {
+    if (education.length > 1) {
+      const updated = [...education];
+      updated.splice(index, 1);
+      setEducation(updated);
+    }
+  };
 
   return (
     <>
@@ -165,18 +174,21 @@ const MultifieldInput = (props) => {
           container
           className={classes.inputBox}
           key={key}
+          spacing={2}
+          alignItems="center"
           style={{ paddingLeft: 0, paddingRight: 0 }}
         >
-          <Grid item xs={6}>
+          <Grid item xs={5}>
             <TextField
               label={`Institution Name #${key + 1}`}
-              value={education[key].institutionName}
+              value={obj.institutionName}
               onChange={(event) => {
                 const newEdu = [...education];
                 newEdu[key].institutionName = event.target.value;
                 setEducation(newEdu);
               }}
               variant="outlined"
+              fullWidth
             />
           </Grid>
           <Grid item xs={3}>
@@ -190,6 +202,7 @@ const MultifieldInput = (props) => {
                 newEdu[key].startYear = event.target.value;
                 setEducation(newEdu);
               }}
+              fullWidth
             />
           </Grid>
           <Grid item xs={3}>
@@ -203,8 +216,20 @@ const MultifieldInput = (props) => {
                 newEdu[key].endYear = event.target.value;
                 setEducation(newEdu);
               }}
+              fullWidth
             />
           </Grid>
+          {education.length > 1 && (
+            <Grid item xs={1}>
+              <IconButton
+                color="secondary"
+                onClick={() => handleDelete(key)}
+                aria-label="delete"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Grid>
+          )}
         </Grid>
       ))}
       <Grid item>
@@ -628,11 +653,16 @@ const Login = (props) => {
 
 </Paper>
 
-{signupDetails.type === "applicant" && (
-      <Paper elevation={2} className={classes.body}>
-        <TemplateDownload signupDetails={signupDetails} />
-      </Paper>
-    )}
+  {
+// signupDetails.type === "applicant" && (
+//       <Paper elevation={2} className={classes.body}>
+//         <TemplateDownload signupDetails={signupDetails} />
+//       </Paper>
+//     )
+  }
+
+
+
   {/* <div style={{ display: "flex", justifyContent: "center" }}>
           <TemplateDownload />
         </div> */}

@@ -35,6 +35,7 @@ const CreateJobs = (props) => {
 
   const [jobDetails, setJobDetails] = useState({
     title: "",
+    description: "",
     maxApplicants: 100,
     maxPositions: 30,
     deadline: new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000)
@@ -131,6 +132,22 @@ const CreateJobs = (props) => {
                     fullWidth
                   />
                 </Grid>
+
+                <Grid item>
+                  <TextField
+                    label="Description"
+                    value={jobDetails.description}
+                    onChange={(event) => handleInput("description", event.target.value)}
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                    fullWidth
+                  />
+                </Grid>
+
+
+
+
                 <Grid item>
                   <ChipInput
                     className={classes.inputBox}
