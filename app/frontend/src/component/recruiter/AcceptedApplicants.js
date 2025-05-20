@@ -558,14 +558,6 @@ const ApplicationTile = (props) => {
           <Grid item>Job Title: {application.job.title}</Grid>
           <Grid item>Role: {application.job.jobType}</Grid>
           <Grid item>Applied On: {appliedOn.toLocaleDateString()}</Grid>
-          <Grid item>
-            SOP: {application.sop !== "" ? application.sop : "Not Submitted"}
-          </Grid>
-          <Grid item>
-            {application.jobApplicant.skills.map((skill) => (
-              <Chip label={skill} style={{ marginRight: "2px" }} />
-            ))}
-          </Grid>
         </Grid>
         <Grid item container direction="column" xs={3}>
           <Grid item>

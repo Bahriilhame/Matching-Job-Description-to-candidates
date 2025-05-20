@@ -580,14 +580,6 @@ const ApplicationTile = (props) => {
               })
               .join(", ")}
           </Grid>
-          <Grid item>
-            SOP: {application.sop !== "" ? application.sop : "Not Submitted"}
-          </Grid>
-          <Grid item>
-            {application.jobApplicant.skills.map((skill) => (
-              <Chip label={skill} style={{ marginRight: "2px" }} />
-            ))}
-          </Grid>
         </Grid>
         <Grid item container direction="column" xs={3}>
           <Grid item>

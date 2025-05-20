@@ -8,7 +8,7 @@ const Recruiter = require("../db/Recruiter");
 const Job = require("../db/Job");
 const Application = require("../db/Application");
 const Rating = require("../db/Rating");
-
+const MatchedApplication = require("../db/ApplicationScore");
 const router = express.Router();
 
 // To add new job
@@ -472,6 +472,8 @@ router.put("/user", jwtAuth, (req, res) => {
 });
 
 // apply for a job [todo: test: done]
+// router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
+router.post("/jobs/:id/applications", jwtAuth, async (req, res) => {
   const user = req.user;
   if (user.type !== "applicant") {
     return res.status(401).json({
@@ -606,7 +608,7 @@ Matching Score (0-100):`;
     console.error(err);
     res.status(500).json({ message: "An error occurred during application." });
   }
-
+});
 
   
 // Route to get matched applications for a specific job, sorted by score
@@ -655,6 +657,7 @@ router.get("/jobs/:jobId/matchedApplications", jwtAuth, async (req, res) => {
           score: 1,
           name: "$applicantInfo.name",
           cv: "$applicantInfo.resume", // Assuming 'resume' field stores CV link/path
+          profile: "$applicantInfo.profile", // Assuming 'resume' field stores CV link/path
           telephone: "$applicantInfo.extractedData.contact.telephone",
           // You might also want to include email or other contact info
           email: "$applicantInfo.extractedData.contact.email",

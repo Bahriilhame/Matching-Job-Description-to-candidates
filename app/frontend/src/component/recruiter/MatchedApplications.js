@@ -13,7 +13,8 @@ import {
   CircularProgress, // For loading state
   TextField, // For limit input
   MenuItem, // For select options
-  Button, // Import Button for the download action
+  Button,
+  Avatar, // Import Button for the download action
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useParams } from "react-router-dom"; // To get jobId from URL
@@ -78,6 +79,10 @@ const useStyles = makeStyles((theme) => ({
   downloadButton: {
     fontSize: "0.8rem",
     padding: "4px 8px",
+  },
+    avatar: {
+    width: theme.spacing(8),
+    height: theme.spacing(8),
   },
 }));
 
@@ -181,13 +186,14 @@ const MatchedApplications = () => {
           onChange={handleLimitChange}
           variant="outlined"
           size="small"
-          className={classes.limitInput}
+          style={{ width: 180 }} // ← increase width here
         >
           <MenuItem value={5}>Top 5</MenuItem>
           <MenuItem value={10}>Top 10</MenuItem>
           <MenuItem value={20}>Top 20</MenuItem>
           <MenuItem value={0}>Show All</MenuItem>
         </TextField>
+
       </div>
 
       {loading ? (
@@ -201,6 +207,7 @@ const MatchedApplications = () => {
           <Table stickyHeader>
             <TableHead>
               <TableRow className={classes.tableHeader}>
+                <TableCell className={classes.tableHeaderCell}></TableCell>
                 <TableCell className={classes.tableHeaderCell}>Name</TableCell>
                 <TableCell className={classes.tableHeaderCell}>CV</TableCell>
                 <TableCell className={classes.tableHeaderCell}>Num de Telephone</TableCell>
@@ -210,7 +217,15 @@ const MatchedApplications = () => {
             </TableHead>
             <TableBody>
               {applications.map((row) => (
+                
                 <TableRow key={row.userId} className={classes.tableRow}>
+                {console.log('row: ', row)}
+                  <TableCell className={classes.tableCell}>
+                              <Avatar
+                                src={`http://localhost:4444${row.profile}`}
+                                className={classes.avatar}
+                              />
+                  </TableCell>
                   <TableCell className={classes.tableCell}>{row.name}</TableCell>
                   <TableCell className={classes.tableCell}>
                     {row.cv ? (

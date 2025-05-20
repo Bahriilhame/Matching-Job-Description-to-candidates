@@ -213,7 +213,7 @@ const JobDetails = () => {
           </div>
         </Grid>
 
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <div className={classes.section}>
             <Typography variant="h6">Rating</Typography>
             <Rating
@@ -226,7 +226,7 @@ const JobDetails = () => {
               </Typography>
             )}
           </div>
-        </Grid>
+        </Grid> */}
       </Grid>
     </Paper>
   );
