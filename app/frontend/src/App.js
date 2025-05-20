@@ -16,8 +16,9 @@ import JobApplications from "./component/recruiter/JobApplications";
 import AcceptedApplicants from "./component/recruiter/AcceptedApplicants";
 import RecruiterProfile from "./component/recruiter/Profile";
 import MessagePopup from "./lib/MessagePopup";
-import isAuth, { userType } from "./lib/isAuth";
+import { userType } from "./lib/isAuth";
 import MatchedApplications from "./component/recruiter/MatchedApplications";
+import JobDetails from "./component/recruiter/JobDetails";
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -108,6 +109,9 @@ function App({location}) {
               </Route>
               <Route exact path="/employees">
                 <AcceptedApplicants />
+              </Route>
+              <Route exact path="/job/:jobId">
+                <JobDetails />
               </Route>
               <Route>
                 <ErrorPage />

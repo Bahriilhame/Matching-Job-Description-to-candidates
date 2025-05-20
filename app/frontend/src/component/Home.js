@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import {
   Button,
-  Chip,
   Grid,
   IconButton,
   InputAdornment,
@@ -12,12 +11,9 @@ import {
   Modal,
   Slider,
   FormControlLabel,
-  FormGroup,
   MenuItem,
   Checkbox,
 } from "@material-ui/core";
-import Rating from "@material-ui/lab/Rating";
-import Pagination from "@material-ui/lab/Pagination";
 import axios from "axios";
 import SearchIcon from "@material-ui/icons/Search";
 import FilterListIcon from "@material-ui/icons/FilterList";
@@ -25,9 +21,9 @@ import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 
 import { SetPopupContext } from "../App";
-
 import apiList from "../lib/apiList";
 import { userType } from "../lib/isAuth";
+import { Link } from "react-router-dom"; // <--- IMPORT Link HERE
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -49,6 +45,14 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
+  jobTitleLink: {
+    textDecoration: "none",
+    color: "inherit",
+    "&:hover": {
+      textDecoration: "underline",
+      color: theme.palette.primary.main, 
+    },
+  },
 }));
 
 const JobTile = (props) => {
@@ -67,7 +71,7 @@ const JobTile = (props) => {
     axios
       .post(
         `${apiList.jobs}/${job._id}/applications`,
-        {}, // Send an empty object as the body if no other data is needed
+        {},
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -100,40 +104,32 @@ const JobTile = (props) => {
       <Grid container>
         <Grid container item xs={9} spacing={1} direction="column">
           <Grid item>
-            <Typography variant="h5">{job.title}</Typography>
+            {/* MAKE THE JOB TITLE A LINK */}
+            <Link to={`/job/${job._id}`} className={classes.jobTitleLink}>
+              <Typography variant="h5">{job.title}</Typography>
+            </Link>
           </Grid>
-          <Grid item>
-            <Rating value={job.rating !== -1 ? job.rating : null} readOnly />
-          </Grid>
-          <Grid item>Role : {job.jobType}</Grid>
           <Grid item>Salary : &#8377; {job.salary} per month</Grid>
-          <Grid item>
-            Duration :{" "}
-            {job.duration !== 0 ? `${job.duration} month` : `Flexible`}
-          </Grid>
-          <Grid item>Posted By : {job.recruiter.name}</Grid>
           <Grid item>Application Deadline : {deadline}</Grid>
-
-          <Grid item>
-            {job.skillsets.map((skill) => (
-              <Chip label={skill} style={{ marginRight: "2px" }} />
-            ))}
-          </Grid>
         </Grid>
         <Grid item xs={3}>
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            onClick={() => handleApply()}
-          >
-            Apply
-          </Button>
+          {userType() === "applicant" && ( // Only show apply button for applicants
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+              onClick={() => handleApply()}
+            >
+              Apply
+            </Button>
+          )}
         </Grid>
       </Grid>
     </Paper>
   );
 };
+
+
 
 const FilterPopup = (props) => {
   const classes = useStyles();

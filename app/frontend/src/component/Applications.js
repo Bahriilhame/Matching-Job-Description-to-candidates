@@ -1,23 +1,15 @@
 import { useState, useEffect, useContext } from "react";
 import {
   Button,
-  Chip,
   Grid,
-  IconButton,
-  InputAdornment,
   makeStyles,
   Paper,
-  TextField,
   Typography,
   Modal,
-  Slider,
-  FormControlLabel,
-  FormGroup,
-  MenuItem,
-  Checkbox,
 } from "@material-ui/core";
 import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 import { SetPopupContext } from "../App";
 
@@ -46,6 +38,14 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+  },
+    jobTitleLink: {
+    textDecoration: "none",
+    color: "inherit",
+    "&:hover": {
+      textDecoration: "underline",
+      color: theme.palette.primary.main,
+    },
   },
 }));
 
@@ -134,21 +134,9 @@ const ApplicationTile = (props) => {
       <Grid container>
         <Grid container item xs={9} spacing={1} direction="column">
           <Grid item>
-            <Typography variant="h5">{application.job.title}</Typography>
-          </Grid>
-          <Grid item>Posted By: {application.recruiter.name}</Grid>
-          <Grid item>Role : {application.job.jobType}</Grid>
-          <Grid item>Salary : &#8377; {application.job.salary} per month</Grid>
-          <Grid item>
-            Duration :{" "}
-            {application.job.duration !== 0
-              ? `${application.job.duration} month`
-              : `Flexible`}
-          </Grid>
-          <Grid item>
-            {application.job.skillsets.map((skill) => (
-              <Chip label={skill} style={{ marginRight: "2px" }} />
-            ))}
+            <Link to={`/job/${application.job._id}`} className={classes.jobTitleLink}>
+              <Typography variant="h5">{application.job.title}</Typography>
+            </Link>
           </Grid>
           <Grid item>Applied On: {appliedOn.toLocaleDateString()}</Grid>
           {application.status === "accepted" ||

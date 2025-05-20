@@ -1,11 +1,10 @@
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css"; // style par défaut
-import { useContext, useEffect, useState } from "react";
+import "react-quill/dist/quill.snow.css";
+import { useContext, useState } from "react";
 import {
   Button,
   Grid,
   Typography,
-  Modal,
   Paper,
   makeStyles,
   TextField,
