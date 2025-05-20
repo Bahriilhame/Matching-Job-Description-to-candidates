@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   },
   jobTitleLink: {
     textDecoration: "none",
-    color: "inherit",
+    color: "#004aad",
     "&:hover": {
       textDecoration: "underline",
       color: theme.palette.primary.main, 
@@ -109,7 +109,7 @@ const JobTile = (props) => {
               <Typography variant="h5">{job.title}</Typography>
             </Link>
           </Grid>
-          <Grid item>Salary : &#8377; {job.salary} per month</Grid>
+          <Grid item>Salary : {job.salary} per month</Grid>
           <Grid item>Application Deadline : {deadline}</Grid>
         </Grid>
         <Grid item xs={3}>

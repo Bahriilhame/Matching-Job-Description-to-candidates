@@ -49,14 +49,14 @@ extrait les données de ce cv en objet JSON bien structuré :
   "contact": {{
     "telephone": "Numéro de téléphone",
     "email": "Adresse e-mail",
-    "adresse": "Adresse postale",
+    "adresse": "Ville",
     "social": ["Liens vers les profils sociaux (LinkedIn, etc.)"]
   }},
   "expérience": [
     {{
       "poste": "Intitulé du poste",
       "lieu": "Lieu (ville, pays)",
-      "durée": "Période (ex: 2020-2022)",
+      "durée": "Durée du poste en années décimales (ex: 1.8 pour 1 an et 10 mois)",
       "entreprise": "Nom de l'entreprise",
       "tâches": ["Liste des principales responsabilités et réalisations"]
     }}
@@ -92,7 +92,7 @@ extrait les données de ce cv en objet JSON bien structuré :
 }}
 
 - "type" dans "formation" doit être soit le nom du diplôme soit "Certificat" s'il existe.
-- Veuillez retourner un objet JSON **strictement** selon cette structure. Si certaines informations ne sont pas présentes, la valeur correspondante doit être null ou une liste vide selon le cas.
+- Veuillez retourner un objet JSON **strictement/ obligatoirement** selon cette structure. Si certaines informations ne sont pas présentes, la valeur correspondante doit être null ou une liste vide selon le cas.
 
 --- Début du CV ---
 {cv_text}

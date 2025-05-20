@@ -9,6 +9,7 @@ const Job = require("../db/Job");
 const Application = require("../db/Application");
 const Rating = require("../db/Rating");
 const MatchedApplication = require("../db/ApplicationScore");
+const JobApplicantInfo = require("../db/JobApplicant");
 const router = express.Router();
 
 // To add new job
@@ -656,10 +657,9 @@ router.get("/jobs/:jobId/matchedApplications", jwtAuth, async (req, res) => {
           _id: 0, // Exclude _id from the root document
           score: 1,
           name: "$applicantInfo.name",
-          cv: "$applicantInfo.resume", // Assuming 'resume' field stores CV link/path
-          profile: "$applicantInfo.profile", // Assuming 'resume' field stores CV link/path
+          cv: "$applicantInfo.resume",
+          profile: "$applicantInfo.profile", 
           telephone: "$applicantInfo.extractedData.contact.telephone",
-          // You might also want to include email or other contact info
           email: "$applicantInfo.extractedData.contact.email",
           userId: "$userId" // Keep userId if you need to link to applicant profile later
         },
