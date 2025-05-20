@@ -472,120 +472,204 @@ router.put("/user", jwtAuth, (req, res) => {
 });
 
 // apply for a job [todo: test: done]
-router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
   const user = req.user;
-  if (user.type != "applicant") {
-    res.status(401).json({
+  if (user.type !== "applicant") {
+    return res.status(401).json({
       message: "You don't have permissions to apply for a job",
     });
-    return;
   }
-  const data = req.body;
   const jobId = req.params.id;
 
-  // check whether applied previously
-  // find job
-  // check count of active applications < limit
-  // check user had < 10 active applications && check if user is not having any accepted jobs (user id)
-  // store the data in applications
-
-  Application.findOne({
-    userId: user._id,
-    jobId: jobId,
-    status: {
-      $nin: ["deleted", "accepted", "cancelled"],
-    },
-  })
-    .then((appliedApplication) => {
-      console.log(appliedApplication);
-      if (appliedApplication !== null) {
-        res.status(400).json({
-          message: "You have already applied for this job",
-        });
-        return;
-      }
-
-      Job.findOne({ _id: jobId })
-        .then((job) => {
-          if (job === null) {
-            res.status(404).json({
-              message: "Job does not exist",
-            });
-            return;
-          }
-          Application.countDocuments({
-            jobId: jobId,
-            status: {
-              $nin: ["rejected", "deleted", "cancelled", "finished"],
-            },
-          })
-            .then((activeApplicationCount) => {
-              if (activeApplicationCount < job.maxApplicants) {
-                Application.countDocuments({
-                  userId: user._id,
-                  status: {
-                    $nin: ["rejected", "deleted", "cancelled", "finished"],
-                  },
-                })
-                  .then((myActiveApplicationCount) => {
-                    if (myActiveApplicationCount < 10) {
-                      Application.countDocuments({
-                        userId: user._id,
-                        status: "accepted",
-                      }).then((acceptedJobs) => {
-                        if (acceptedJobs === 0) {
-                          const application = new Application({
-                            userId: user._id,
-                            recruiterId: job.userId,
-                            jobId: job._id,
-                            status: "applied",
-                            sop: data.sop,
-                          });
-                          application
-                            .save()
-                            .then(() => {
-                              res.json({
-                                message: "Job application successful",
-                              });
-                            })
-                            .catch((err) => {
-                              res.status(400).json(err);
-                            });
-                        } else {
-                          res.status(400).json({
-                            message:
-                              "You already have an accepted job. Hence you cannot apply.",
-                          });
-                        }
-                      });
-                    } else {
-                      res.status(400).json({
-                        message:
-                          "You have 10 active applications. Hence you cannot apply.",
-                      });
-                    }
-                  })
-                  .catch((err) => {
-                    res.status(400).json(err);
-                  });
-              } else {
-                res.status(400).json({
-                  message: "Application limit reached",
-                });
-              }
-            })
-            .catch((err) => {
-              res.status(400).json(err);
-            });
-        })
-        .catch((err) => {
-          res.status(400).json(err);
-        });
-    })
-    .catch((err) => {
-      res.json(400).json(err);
+  try {
+    // 1. Check if already applied
+    const appliedApplication = await Application.findOne({
+      userId: user._id,
+      jobId: jobId,
+      status: {
+        $nin: ["deleted", "accepted", "cancelled"],
+      },
     });
+
+    if (appliedApplication) {
+      return res.status(400).json({
+        message: "You have already applied for this job",
+      });
+    }
+
+    // 2. Find job and applicant info
+    const job = await Job.findOne({ _id: jobId });
+    if (!job) {
+      return res.status(404).json({
+        message: "Job does not exist",
+      });
+    }
+
+    const applicantInfo = await JobApplicantInfo.findOne({ userId: user._id });
+    if (!applicantInfo || !applicantInfo.extractedData) {
+      return res.status(400).json({
+        message: "Applicant profile data not found or incomplete.",
+      });
+    }
+
+    // 3. Check application limits
+    const activeApplicationCount = await Application.countDocuments({
+      jobId: jobId,
+      status: {
+        $nin: ["rejected", "deleted", "cancelled", "finished"],
+      },
+    });
+
+    if (activeApplicationCount >= job.maxApplicants) {
+      return res.status(400).json({
+        message: "Application limit reached for this job",
+      });
+    }
+
+    const myActiveApplicationCount = await Application.countDocuments({
+      userId: user._id,
+      status: {
+        $nin: ["rejected", "deleted", "cancelled", "finished"],
+      },
+    });
+
+    if (myActiveApplicationCount >= 10) {
+      return res.status(400).json({
+        message: "You have 10 active applications. Hence you cannot apply.",
+      });
+    }
+
+    const acceptedJobs = await Application.countDocuments({
+      userId: user._id,
+      status: "accepted",
+    });
+
+    if (acceptedJobs > 0) {
+      return res.status(400).json({
+        message: "You already have an accepted job. Hence you cannot apply.",
+      });
+    }
+
+    // 4. Prepare data for Gemini and call API
+    const jobDescription = job.description;
+    const applicantExtractedData = JSON.stringify(applicantInfo.extractedData); // Convert object to string for prompt
+
+    const prompt = `Given the following job description and applicant's extracted data, evaluate how well the applicant's skills and experience match the job requirements. Provide a matching score between 0 and 100, where 100 is a perfect match. Focus on skills, experience, and education. Only return the score as a number.
+
+Job Description:
+${jobDescription}
+
+Applicant's Extracted Data:
+${applicantExtractedData}
+
+Matching Score (0-100):`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    console.log("Gemini Raw Response Text:", text); // <-- Add this line
+
+    let matchingScore;
+    try {
+      matchingScore = parseFloat(text.trim());
+      console.log("Parsed Matching Score:", matchingScore); // <-- And this line
+      if (isNaN(matchingScore) || matchingScore < 0 || matchingScore > 100) {
+        console.warn("Gemini returned an invalid score:", text);
+        matchingScore = 0;
+      }
+    } catch (e) {
+      console.error("Error parsing Gemini score:", e);
+      matchingScore = 0;
+    }
+
+    // 5. Create new application
+    const application = new Application({
+      userId: user._id,
+      recruiterId: job.userId,
+      jobId: job._id,
+      status: "applied",
+    });
+    await application.save();
+
+    // 6. Store the matching score
+    const matchedApplication = new MatchedApplication({
+      userId: user._id,
+      jobId: job._id,
+      score: matchingScore,
+    });
+    await matchedApplication.save();
+
+    res.json({
+      message: "Job application successful and matching score calculated!",
+      score: matchingScore,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "An error occurred during application." });
+  }
+
+
+  
+// Route to get matched applications for a specific job, sorted by score
+router.get("/jobs/:jobId/matchedApplications", jwtAuth, async (req, res) => {
+  const user = req.user;
+  const jobId = req.params.jobId;
+  const limit = parseInt(req.query.limit) || 0; // Get limit from query, default to 0 (no limit)
+
+  try {
+    // Optional: Verify that the authenticated user is the recruiter who posted this job
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ message: "Job not found." });
+    }
+    if (user.type !== "recruiter" || job.userId.toString() !== user._id.toString()) {
+      return res.status(403).json({ message: "Unauthorized access to job applications." });
+    }
+
+    const matchedApplications = await MatchedApplication.aggregate([
+      {
+        $match: {
+          jobId: mongoose.Types.ObjectId(jobId),
+        },
+      },
+      {
+        $sort: {
+          score: -1, // Sort by score in descending order (highest score first)
+        },
+      },
+      // Apply limit if provided and greater than 0
+      ...(limit > 0 ? [{ $limit: limit }] : []),
+      {
+        $lookup: {
+          from: "jobapplicantinfos", // The collection name for JobApplicantInfo model
+          localField: "userId",
+          foreignField: "userId",
+          as: "applicantInfo",
+        },
+      },
+      {
+        $unwind: "$applicantInfo", // Deconstructs the applicantInfo array
+      },
+      {
+        $project: {
+          _id: 0, // Exclude _id from the root document
+          score: 1,
+          name: "$applicantInfo.name",
+          cv: "$applicantInfo.resume", // Assuming 'resume' field stores CV link/path
+          telephone: "$applicantInfo.extractedData.contact.telephone",
+          // You might also want to include email or other contact info
+          email: "$applicantInfo.extractedData.contact.email",
+          userId: "$userId" // Keep userId if you need to link to applicant profile later
+        },
+      },
+    ]);
+
+    res.status(200).json(matchedApplications);
+  } catch (err) {
+    console.error("Error fetching matched applications:", err);
+    res.status(500).json({ message: "Server error while fetching matched applications." });
+  }
 });
+
 
 // recruiter gets applications for a particular job [pagination] [todo: test: done]
 router.get("/jobs/:id/applications", jwtAuth, (req, res) => {

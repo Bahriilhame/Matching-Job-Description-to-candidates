@@ -4,7 +4,7 @@ const matchedApplicationSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "JobApplicantInfo", // ou "User" si tu as une collection séparée
+      ref: "JobApplicantInfo",
       required: true,
     },
     jobId: {
@@ -30,4 +30,4 @@ const matchedApplicationSchema = new mongoose.Schema(
   { collation: { locale: "en" }, timestamps: true }
 );
 
-module.exports = mongoose.model("MatchedApplication", matchedApplicationSchema);
+module.exports = mongoose.model("ApplicationScore", matchedApplicationSchema);

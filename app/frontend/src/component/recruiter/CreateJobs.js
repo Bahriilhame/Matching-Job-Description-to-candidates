@@ -1,3 +1,5 @@
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css"; // style par défaut
 import { useContext, useEffect, useState } from "react";
 import {
   Button,
@@ -133,22 +135,20 @@ const CreateJobs = (props) => {
                   />
                 </Grid>
 
-                <Grid item>
-                  <TextField
-                    label="Description"
+                <Grid item style={{ marginBottom: "20px" }}>
+                  <Typography variant="h6">Description</Typography>
+                  <ReactQuill
+                    theme="snow"
                     value={jobDetails.description}
-                    onChange={(event) => handleInput("description", event.target.value)}
-                    variant="outlined"
-                    multiline
-                    rows={4}
-                    fullWidth
+                    onChange={(value) => handleInput("description", value)}
+                    style={{ height: "200px", marginBottom: "20px" }}
                   />
                 </Grid>
 
 
 
 
-                <Grid item>
+                <Grid item style={{ marginBottom: "20px" }}>
                   <ChipInput
                     className={classes.inputBox}
                     label="Skills"
