@@ -12,6 +12,11 @@ const MatchedApplication = require("../db/ApplicationScore");
 const JobApplicantInfo = require("../db/JobApplicant");
 const router = express.Router();
 
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const genAI = new GoogleGenerativeAI("AIzaSyAa_qSeIDU7f2m9TkBTUomvjr691ce04rs");
+
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
 // To add new job
 router.post("/jobs", jwtAuth, (req, res) => {
   const user = req.user;
