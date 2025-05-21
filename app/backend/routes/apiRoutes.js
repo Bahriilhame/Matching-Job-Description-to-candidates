@@ -662,6 +662,7 @@ router.get("/jobs/:jobId/matchedApplications", jwtAuth, async (req, res) => {
           _id: 0, // Exclude _id from the root document
           score: 1,
           name: "$applicantInfo.name",
+          extractedData: "$applicantInfo.extractedData",
           cv: "$applicantInfo.resume",
           profile: "$applicantInfo.profile", 
           telephone: "$applicantInfo.extractedData.contact.telephone",
