@@ -429,7 +429,7 @@ const MatchedApplications = () => {
         </Grid>
 
         {/* Establishment Filter (Autocomplete) - Remains Multi-select */}
-        <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Grid item xs={12} sm={6} md={4} lg={6}>
           <Autocomplete
             multiple
             options={uniqueEstablishments}
