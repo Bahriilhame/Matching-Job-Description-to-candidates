@@ -608,7 +608,8 @@ const Login = (props) => {
             </Grid>
             <Grid item>
               <PhoneInput
-                country={"in"}
+                country={"ma"} // Default to Morocco
+                excludeCountries={["il"]} // Exclude Israel
                 value={phone}
                 onChange={(phone) => setPhone(phone)}
               />
