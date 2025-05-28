@@ -1,6 +1,7 @@
 import { Grid, Typography } from "@material-ui/core";
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext , useState } from 'react';
 import { useHistory } from "react-router-dom";
+import { SetPopupContext } from "../App";
 
 const Welcome = () => {
   useEffect(() => {
@@ -30,6 +31,65 @@ const Welcome = () => {
   const handleClick = (location) => {
     console.log(location);
     history.push(location);
+  };
+
+  const setPopup = useContext(SetPopupContext);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.name || !formData.email || !formData.message) {
+      setPopup({
+        open: true,
+        severity: "error",
+        message: "Merci de remplir tous les champs.",
+      });
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:4444/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setPopup({
+          open: true,
+          severity: "success",
+          message: data.message || "Message envoyé avec succès.",
+        });
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        setPopup({
+          open: true,
+          severity: "error",
+          message: data.message || "Erreur lors de l'envoi du message.",
+        });
+      }
+    } catch (err) {
+      setPopup({
+        open: true,
+        severity: "error",
+        message: "Erreur réseau, veuillez réessayer plus tard.",
+      });
+    }
   };
 
   return (
@@ -497,7 +557,7 @@ const Welcome = () => {
       </section>
 
 
-      <section id="contact">
+      {/* <section id="contact">
         <h2>Contactez-nous</h2>
         <p>Pour toute question, n'hésitez pas à nous contacter.</p>
         <form>
@@ -506,8 +566,35 @@ const Welcome = () => {
           <textarea placeholder="Votre message"></textarea>
           <button type="submit">Envoyer</button>
         </form>
-      </section>
+      </section> */}
 
+    <section id="contact">
+      <h2>Contactez-nous</h2>
+      <p>Pour toute question, n&apos;hésitez pas à nous contacter.</p>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Votre nom"
+          value={formData.name}
+          onChange={handleChange}
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Votre email"
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <textarea
+          name="message"
+          placeholder="Votre message"
+          value={formData.message}
+          onChange={handleChange}
+        />
+        <button type="submit">Envoyer</button>
+      </form>
+    </section>
     </div>
    </div>
   );

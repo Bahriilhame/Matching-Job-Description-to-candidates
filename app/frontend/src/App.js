@@ -2,7 +2,8 @@ import { createContext, useState, useEffect } from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import { Grid, makeStyles } from "@material-ui/core";
 
-import Welcome, { ErrorPage } from "./component/Welcome";
+// import Welcome, { ErrorPage } from "./component/Welcome";
+import Welcome from "./component/Welcome";
 import Navbar from "./component/Navbar";
 import Login from "./component/Login";
 import Logout from "./component/Logout";
@@ -113,9 +114,9 @@ function App({location}) {
               <Route exact path="/job/:jobId">
                 <JobDetails />
               </Route>
-              <Route>
+              {/* <Route>
                 <ErrorPage />
-              </Route>
+              </Route> */}
             </Switch>
           </Grid>
         </Grid>
