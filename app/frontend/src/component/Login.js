@@ -16,6 +16,7 @@ import { SetPopupContext } from "../App";
 
 import apiList from "../lib/apiList";
 import isAuth from "../lib/isAuth";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -141,6 +142,18 @@ const Login = (props) => {
             Login
           </Button>
         </Grid>
+<Grid item>
+  <Typography variant="body2">
+    Don't have an account?{" "}
+    <Link
+      to="/signup"
+      style={{ color: "#3f51b5", fontWeight: "bold", textDecoration: "none" }}
+    >
+      Sign up
+    </Link>
+  </Typography>
+</Grid>
+
       </Grid>
     </Paper>
   );
