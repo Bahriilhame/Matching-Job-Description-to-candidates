@@ -52,6 +52,6 @@ This project streamlines the recruitment workflow, enabling efficient job manage
 
 Voici une courte démonstration :
 
-<video src="démonstration platforme CV.mp4" autoplay loop muted playsinline width="600"></video>
+<video src="[démonstration platforme CV.mp4](https://streamable.com/otcuo7)" autoplay loop muted playsinline width="600"></video>
 
 <div align="left"><a href="#top">⬆ Return</a></div>
