@@ -27,6 +27,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [Démo du projet](#Démo_du_projet)
 
 ---
 
@@ -47,5 +48,10 @@ This project streamlines the recruitment workflow, enabling efficient job manage
 
 ---
 
+## Démo_du_projet
+
+Voici une courte démonstration :
+
+<video src="démonstration platforme CV.mp4" autoplay loop muted playsinline width="600"></video>
 
 <div align="left"><a href="#top">⬆ Return</a></div>
